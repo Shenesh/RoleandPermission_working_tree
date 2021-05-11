@@ -1,0 +1,1 @@
+<h1> This is Post Index page</h1>
