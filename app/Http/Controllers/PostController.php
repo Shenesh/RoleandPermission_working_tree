@@ -14,21 +14,29 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct(){
+        $this->middleware('auth');
+    }
+
+
     public function index()
     {
-        // if(Gate::allows('isAdmin')){
-        //     //dd('the user is Admin');
-        //     return view('post.index');
-        // }
-        // else{
-        //     dd('the user is not admin');
-        // }
-        if(Gate::denies('isAdmin')){
-            //dd('the user is Admin');
-            abort(403);
+        if(Gate::any(['isAdmin','isEditor','isManager'])){
+            $posts = Post:: where('published',1)->get(); 
+            
+
+            return view('post.index', compact('posts'));
         }
-        return(Auth::user()->roles()->get());
-       
+        else{
+            dd('the user is not an admin or editor');
+        }
+        // if(Gate::denies('isAdmin,isEditor')){
+        //     //dd('the user is Admin');
+        //     abort(403);
+        // }
+        //return(Auth::user()->roles()->get());
+ 
     }
 
     /**
@@ -38,7 +46,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('post.create');
     }
 
     /**
@@ -49,7 +57,18 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request,[
+            'title'=>'required',
+            'body'=>'required'
+        ]);
+
+        $post = new Post;
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        $post->user_id = auth()->user()->id;
+        $post->save();
+
+        return redirect('/post')->with('success','Post Created');
     }
 
     /**
@@ -58,9 +77,19 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post)
+    public function show(Request $request, Post $post)
     {
-        //
+        if (\Request::ajax()){
+          //  dd($request);
+            $post = Post::find($request['task']['id']);
+            $post->published = $request['task']['checked'];
+            $post->save();
+
+            return $request;
+        }
+
+        return view('post.show', compact('post'));
+       
     }
 
     /**
@@ -71,7 +100,8 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $this->authorize('edit',$post);
+        return view('post.edit', compact('post'));
     }
 
     /**
@@ -83,7 +113,10 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $this->authorize('update', $post);  
+
+        $post->update ($request->all());
+        return redirect('/post')->with('success','Post Updated');
     }
 
     /**
@@ -96,4 +129,8 @@ class PostController extends Controller
     {
         //
     }
+   
+
+
+   
 }

@@ -13,7 +13,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-         'App\Model' => 'App\Policies\ModelPolicy',
+         'App\Model' => 'App\Policies\ModelPolicy', //this is just a cmmoen name for the policy
+         'App\Post' => 'App\Policies\PostPolicy',
     ];
 
     /**
@@ -33,8 +34,9 @@ class AuthServiceProvider extends ServiceProvider
            return $user->roles->first()->slug == 'manager';
         });
 
-        Gate::define('isContentEditor', function ($user) {
-           return $user->roles->first()->slug == 'content-editor';
+        Gate::define('isEditor', function ($user) {
+           return $user->roles->first()->slug == 'editor';
         });
+
     }
 }

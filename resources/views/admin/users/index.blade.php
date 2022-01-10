@@ -19,6 +19,7 @@
         <div class="card-header">
             <i class="fas fa-table mr-1"></i>
             User Table
+            <a href="{{ url('/users/create') }}" class="btn btn-primary btn-sm float-right">Create a new user</a>
         </div>
         <div class="card-body">
             <table id="" class="display compact row-border stripe" style="width:100%">
@@ -26,7 +27,7 @@
                 </thead>
                 <tbody>
                     @foreach ($users as $user)      
-                    @if(!\Auth::user()->hasRole('admin') && $user->hasRole('admin')) @continue; @endif                          
+                    @if(!\Auth::user()->hasRole('admin') && $user->hasRole('admin')) @continue; @endif                   
                     <tr {{ Auth::user()->id == $user->id ? 'bgcolor=#ddd' : '' }}>
                      
                         <td>{{$user['id']}}</td>

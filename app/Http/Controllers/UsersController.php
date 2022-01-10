@@ -5,6 +5,7 @@ use App\User;
 use DataTables;
 use App\Permission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
@@ -17,6 +18,7 @@ class UsersController extends Controller
     public function index()
     {
 
+        
         $users = User::orderBy('id', 'desc')->get();
         
 
@@ -29,6 +31,10 @@ class UsersController extends Controller
      */
     public function create(Request $request)
     {
+        if (Gate::denies('isAdmin')) {
+            abort('403');
+        }
+
         if($request->ajax()){
             //return response()->json(['test'=>'test_data']);
             $roles = Role::where('id',$request->role_id)->first(); 
@@ -37,8 +43,8 @@ class UsersController extends Controller
 
         }
         $roles = Role::all();
-        $permissions = Permission::all();
-        return view('admin.users.create',compact('roles','permissions'));
+       
+        return view('admin.users.create',compact('roles'));
     }
     /**
      * Store a newly created resource in storage.
@@ -92,6 +98,7 @@ class UsersController extends Controller
     {
         $roles = Role::get();
         $userRole = $user->roles->first();
+       // return( $userRole->name);
         if($userRole != null){
             $rolePermissions = $userRole->allRolePermissions;
         }else{

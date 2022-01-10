@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('users', 'UsersController');
+Route::resource('users', 'UsersController')->middleware('role:admin,manager');
 Route::resource('post', 'PostController');
 Route::resource('roles', 'RoleController')->middleware('can:isAdmin');
 Route::resource('permissions', 'PermissionController');
@@ -38,3 +38,7 @@ Route::get('dash/', function() {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/newlogin', function () {
+    return view('auth.newlogin');
+});

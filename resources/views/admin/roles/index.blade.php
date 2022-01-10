@@ -17,7 +17,7 @@
                       </span>
                   @endforeach
                   
-              @endif</td>
+            @endif</td>
                 
             <td>
                 <form action="{{ route('roles.destroy',$role->id) }}" method="POST">

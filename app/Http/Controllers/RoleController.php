@@ -16,6 +16,7 @@ class RoleController extends Controller
     public function index()
     {
         $roles=Role::all();
+        
         return view('admin.roles.index',compact('roles'));
     }
 
@@ -26,8 +27,7 @@ class RoleController extends Controller
      */
     public function create()
     {
-
-        return view('admin.roles.create');
+         return view('admin.roles.create');
     }
 
     /**
@@ -38,6 +38,13 @@ class RoleController extends Controller
      */
     public function store(Request $request, Role $role)
     {
+      validator($request->all(),[
+        'name'=>'required|unique:roles,name',
+        'slug'=>'required',
+        'permissions'=>'required',
+        ])->validate();
+    
+
         $role->name = $request->name;
         $role->slug = $request->slug;
         $role->save();
@@ -93,22 +100,9 @@ class RoleController extends Controller
         $role->slug = $request->slug;
      
         $role->save();
-        $role->permissions()->delete();
-        $role->permissions()->detach();
         
-
-        $permission_set = explode(',',$request->permissions);
-        foreach($permission_set as $permission){
-            $permissions = new Permission();
-            $permissions->name = $permission;
-            $permissions->slug = strtolower(str_replace(" ","-",$permission));
-            $permissions->save();
-            $role->permissions()->attach($permissions->id);
-            $role->save();
-
-        }
-
-
+        
+        
         return redirect()->route('roles.index');
         //Here you can pass a msg to view if you want. 
     }
@@ -121,9 +115,8 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        $role->permissions()->delete();
+       
         $role->delete();
-        $role->permissions()->detach();
         return redirect()->route('roles.index');
 
     }

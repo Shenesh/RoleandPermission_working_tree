@@ -28,6 +28,10 @@ trait HasRolesAndPermissions{
         return $this->belongsToMany(Permission::class,'users_permissions');
     }
 
+    public function post(){
+        return $this->hasMany('App\Post');
+    }
+
 
     
     public function hasRole($role)
